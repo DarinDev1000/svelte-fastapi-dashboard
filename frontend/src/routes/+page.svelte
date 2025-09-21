@@ -2,11 +2,36 @@
   import { onMount } from 'svelte';
   import TemperatureChart from '$lib/components/TemperatureChart.svelte';
   import HumidityGauge from '$lib/components/HumidityGauge.svelte';
+  import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+  import AlertBanner from '$lib/components/AlertBanner.svelte';
   import type { SensorReading } from '$lib/types';
 
   let currentReading = $state<SensorReading | null>(null);
   let historicalData = $state<SensorReading[]>([]);
   let eventSource = $state<EventSource | undefined>(undefined);
+  let tempThreshold = $state(25);
+  let humidityThreshold = $state(60);
+  let alertMessage = $state('');
+  let alertType = $state<'warning' | 'critical'>('warning');
+
+  function checkAlertConditions(reading: SensorReading) {
+    if (reading.temperature > tempThreshold) {
+      alertMessage = `High temperature detected: ${reading.temperature}°C`;
+      alertType = 'critical';
+    } else if (reading.humidity > humidityThreshold) {
+      alertMessage = `High humidity detected: ${reading.humidity}%`;
+      alertType = 'warning';
+    } else {
+      alertMessage = '';
+    }
+  }
+
+  // Reactive effect to check alerts when thresholds or readings change
+  $effect(() => {
+    if (currentReading) {
+      checkAlertConditions(currentReading);
+    }
+  });
 
   onMount(async () => {
     // Initial data fetch
@@ -19,6 +44,9 @@
     eventSource.addEventListener('sensor_update', (event) => {
       currentReading = JSON.parse(event.data);
       historicalData = [...historicalData, currentReading].slice(-30); // Keep last 30 readings
+      if (currentReading) {
+        checkAlertConditions(currentReading);
+      }
     });
 
     return () => {
@@ -26,6 +54,8 @@
     };
   });
 </script>
+
+<AlertBanner message={alertMessage} type={alertType} />
 
 <main class="container">
   <h1>Sensor Dashboard</h1>
@@ -117,3 +147,10 @@
     }
   }
 </style>
+
+<SettingsPanel
+  tempThreshold={tempThreshold}
+  humidityThreshold={humidityThreshold}
+  onTempChange={(value) => tempThreshold = value}
+  onHumidityChange={(value) => humidityThreshold = value}
+/>
