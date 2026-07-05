@@ -34,7 +34,7 @@
   });
 
   onMount(async () => {
-    const BACKEND_URL = '127.0.0.1:8000'
+    const BACKEND_URL = import.meta.env.BACKEND_URL || 'https://127.0.0.1:8000'
     // const BACKEND_URL = 'https://api-svelte-fastapi-dashboard.coolify-pve2.ddctech.net'
     // Initial data fetch
     const response = await fetch(`${BACKEND_URL}/current`);
