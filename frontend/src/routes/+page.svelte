@@ -34,13 +34,15 @@
   });
 
   onMount(async () => {
+    const BACKEND_URL = '127.0.0.1:8000'
+    // const BACKEND_URL = 'https://api-svelte-fastapi-dashboard.coolify-pve2.ddctech.net'
     // Initial data fetch
-    const response = await fetch('http://localhost:8000/current');
+    const response = await fetch(`${BACKEND_URL}/current`);
     currentReading = await response.json();
     historicalData = [currentReading];
 
     // Set up SSE connection
-    eventSource = new EventSource('http://localhost:8000/stream');
+    eventSource = new EventSource(`${BACKEND_URL}/stream`);
     eventSource.addEventListener('sensor_update', (event) => {
       currentReading = JSON.parse(event.data);
       historicalData = [...historicalData, currentReading].slice(-30); // Keep last 30 readings
