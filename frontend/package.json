@@ -16,6 +16,7 @@
 		"test": "npm run test:unit -- --run"
 	},
 	"devDependencies": {
+		"node": "^22",
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
 		"@sveltejs/adapter-auto": "^4.0.0",
@@ -47,6 +48,8 @@
 		]
 	},
 	"dependencies": {
+		"@sveltejs/adapter-node": "^5.5.7",
+		"@sveltejs/adapter-static": "^3.0.10",
 		"@types/chart.js": "2.9.41",
 		"chart.js": "4.4.8"
 	}
